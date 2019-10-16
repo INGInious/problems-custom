@@ -122,8 +122,8 @@ class DisplayableCustomProblem(CustomProblem, DisplayableProblem):
         self._init_boxes(content)
 
     @classmethod
-    def get_type_name(cls, gettext):
-        return "custom 2"
+    def get_type_name(cls, language):
+        return "custom"
 
     def adapt_input_for_backend(self, input_data):
         for box in self._boxes:
