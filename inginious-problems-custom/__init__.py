@@ -143,11 +143,11 @@ class DisplayableCustomProblem(CustomProblem, DisplayableProblem):
         return template_helper.get_custom_renderer(os.path.join(PATH_TO_PLUGIN, "templates"), False)
 
     @classmethod
-    def show_editbox(cls, template_helper, key):
+    def show_editbox(cls, template_helper, key, language):
         return DisplayableCustomProblem.get_renderer(template_helper).custom_edit(key)
 
     @classmethod
-    def show_editbox_templates(cls, template_helper, key):
+    def show_editbox_templates(cls, template_helper, key, language):
         return ""
 
 
