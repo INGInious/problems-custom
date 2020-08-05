@@ -89,7 +89,7 @@ class CustomProblem(Problem):
         return self._box_types[box_content["type"]](self, boxid, box_content)
 
     def check_answer(self, _, __):
-        return None, None, None, 0
+        return None, None, None, 0, ""
 
     @classmethod
     def parse_problem(self, problem_content):
