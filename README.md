@@ -29,7 +29,7 @@ Boxes input are fetch using the following syntax : ``problemid/boxid``
                     content: |-
                         .. raw:: html
 
-                            <code>for(j=</code>
+                            <div class="row"><code>for(j=</code>
                 for1:
                     type: input-integer
                     maxChars: 3
@@ -56,7 +56,7 @@ Boxes input are fetch using the following syntax : ``problemid/boxid``
                     content: |-
                         .. raw:: html
 
-                            <code>)</code>
+                            <code>)</code></div>
                 text5:
                     type: text
                     content: '``{``'

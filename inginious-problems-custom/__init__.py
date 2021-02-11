@@ -42,13 +42,11 @@ class StaticMockPage(object):
 class CustomProblem(Problem):
     """Basic problem with code input. Do all the job with the backend"""
 
-    def __init__(self, task, problemid, content, translations=None):
-        Problem.__init__(self, task, problemid, content, translations)
+    def __init__(self, problemid, content, translations, taskfs):
+        Problem.__init__(self, problemid, content, translations, taskfs)
         self._boxes = []
         self._box_types = {"input-text": InputBox, "input-decimal": InputBox, "input-integer": InputBox,
                            "multiline": MultilineBox, "text": TextBox, "file": FileBox}
-        if task.get_environment() is None:
-            raise Exception("Environment undefined, but there is a problem with type=code or type=code-single-line")
 
         self._init_boxes(content)
 
@@ -110,8 +108,9 @@ class CustomProblem(Problem):
 class DisplayableCustomProblem(CustomProblem, DisplayableProblem):
     """ A displayable match problem """
 
-    def __init__(self, task, problemid, content, translations=None):
-        CustomProblem.__init__(self, task, problemid, content, translations)
+    def __init__(self, problemid, content, translations, taskfs):
+        Problem.__init__(self, problemid, content, translations, taskfs)
+        self._boxes = []
         self._box_types = {
             "input-text": DisplayableInputBox,
             "input-decimal": DisplayableInputBox,
