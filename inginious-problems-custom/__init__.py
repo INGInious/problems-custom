@@ -21,6 +21,7 @@ from collections import OrderedDict
 __version__ = "0.1.dev0"
 
 PATH_TO_PLUGIN = os.path.abspath(os.path.dirname(__file__))
+PATH_TO_TEMPLATES = os.path.join(PATH_TO_PLUGIN, "templates")
 
 
 class StaticMockPage(object):
@@ -137,13 +138,8 @@ class DisplayableCustomProblem(CustomProblem, DisplayableProblem):
         return output
 
     @classmethod
-    def get_renderer(cls, template_helper):
-        """ Get the renderer for this class problem """
-        return template_helper.get_custom_renderer(os.path.join(PATH_TO_PLUGIN, "templates"), False)
-
-    @classmethod
     def show_editbox(cls, template_helper, key, language):
-        return DisplayableCustomProblem.get_renderer(template_helper).custom_edit(key)
+        return template_helper.render("custom_edit.html", template_folder=PATH_TO_TEMPLATES, key=key)
 
     @classmethod
     def show_editbox_templates(cls, template_helper, key, language):
@@ -188,11 +184,6 @@ class BasicBox(object, metaclass=ABCMeta):
             raise Exception("Invalid box _id: " + boxid)
         self._id = boxid
         self._problem = problem
-
-    @classmethod
-    def get_renderer(cls, template_helper):
-        """ Get the renderer for this class problem """
-        return template_helper.get_custom_renderer(os.path.join(PATH_TO_PLUGIN, "templates"), False)
 
 
 class TextBox(BasicBox):
@@ -368,11 +359,6 @@ class DisplayableBox(object, metaclass=ABCMeta):
         """ Get the html to show this box """
         pass
 
-    @classmethod
-    def get_renderer(cls, template_helper):
-        """ Get the renderer for this class problem """
-        return template_helper.get_renderer(False)
-
 
 class DisplayableTextBox(TextBox, DisplayableBox):
     """ A displayable text box """
@@ -382,7 +368,8 @@ class DisplayableTextBox(TextBox, DisplayableBox):
 
     def show(self, template_helper, language):
         """ Show TextBox """
-        return str(DisplayableTextBox.get_renderer(template_helper).box_text(ParsableText(self._content, "rst", translation=gettext.NullTranslations())))
+        return template_helper.render("box_text.html", template_folder=PATH_TO_TEMPLATES,
+                                      text=ParsableText(self._content, "rst", translation=gettext.NullTranslations()))
 
 
 class DisplayableFileBox(FileBox, DisplayableBox):
@@ -401,7 +388,9 @@ class DisplayableFileBox(FileBox, DisplayableBox):
 
     def show(self, template_helper, language):
         """ Show FileBox """
-        return str(DisplayableFileBox.get_renderer(template_helper).box_file(self.get_complete_id(), self._max_size, self._allowed_exts, json))
+        return template_helper.render("box_file.html", template_folder=PATH_TO_TEMPLATES,
+                                      inputId=self.get_complete_id(), max_size=self._max_size,
+                                      allowed_exts=self._allowed_exts, json=json)
 
 
 class DisplayableInputBox(InputBox, DisplayableBox):
@@ -412,7 +401,9 @@ class DisplayableInputBox(InputBox, DisplayableBox):
 
     def show(self, template_helper, language):
         """ Show InputBox """
-        return str(DisplayableInputBox.get_renderer(template_helper).box_input(self.get_complete_id(), self._input_type, self._max_chars, self._optional))
+        return template_helper.render("box_input.html", template_folder=PATH_TO_TEMPLATES,
+                                      inputId=self.get_complete_id(), type=self._input_type,
+                                      maxChars=self._max_chars, optional=self._optional)
 
 
 class DisplayableMultilineBox(MultilineBox, DisplayableBox):
@@ -423,7 +414,9 @@ class DisplayableMultilineBox(MultilineBox, DisplayableBox):
 
     def show(self, template_helper, language):
         """ Show MultilineBox """
-        return str(DisplayableMultilineBox.get_renderer(template_helper).box_multiline(self.get_complete_id(), self._lines, self._max_chars, self._language, self._optional))
+        return template_helper.render("box_multiline.html", template_folder=PATH_TO_TEMPLATES,
+                                      inputId=self.get_complete_id(), lines=self._lines, maxChars=self._max_chars,
+                                      language=self._language, optional=self._optional)
 
 
 def init(plugin_manager, course_factory, client, plugin_config):
