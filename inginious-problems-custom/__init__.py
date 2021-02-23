@@ -4,18 +4,19 @@
 # more information about the licensing of this file.
 
 import os
-import web
 import json
 import re
 import sys
 import gettext
+
+from flask import send_from_directory
 from abc import ABCMeta, abstractmethod
 
 from inginious.common.base import id_checker
 from inginious.common.tasks_problems import Problem
+from inginious.frontend.pages.utils import INGIniousPage
 from inginious.frontend.task_problems import DisplayableProblem
 from inginious.frontend.parsable_text import ParsableText
-import json
 from collections import OrderedDict
 
 __version__ = "0.1.dev0"
@@ -24,21 +25,12 @@ PATH_TO_PLUGIN = os.path.abspath(os.path.dirname(__file__))
 PATH_TO_TEMPLATES = os.path.join(PATH_TO_PLUGIN, "templates")
 
 
-class StaticMockPage(object):
-    # TODO: Replace by shared static middleware and let webserver serve the files
+class StaticMockPage(INGIniousPage):
     def GET(self, path):
-        if not os.path.abspath(PATH_TO_PLUGIN) in os.path.abspath(os.path.join(PATH_TO_PLUGIN, path)):
-            raise web.notfound()
-
-        try:
-            with open(os.path.join(PATH_TO_PLUGIN, "static", path), 'rb') as file:
-                return file.read()
-        except:
-            raise web.notfound()
+        return send_from_directory(os.path.join(PATH_TO_PLUGIN, "static"), path)
 
     def POST(self, path):
         return self.GET(path)
-
 
 class CustomProblem(Problem):
     """Basic problem with code input. Do all the job with the backend"""
@@ -351,7 +343,7 @@ class DisplayableBox(object, metaclass=ABCMeta):
         pass
 
     def adapt_input_for_backend(self, input_data):
-        """ Adapt the input from web.py for the inginious.backend """
+        """ Adapt the input from web input for the inginious.backend """
         return input_data
 
     @abstractmethod
@@ -421,7 +413,7 @@ class DisplayableMultilineBox(MultilineBox, DisplayableBox):
 
 def init(plugin_manager, course_factory, client, plugin_config):
     # TODO: Replace by shared static middleware and let webserver serve the files
-    plugin_manager.add_page('/plugins/custom/static/(.+)', StaticMockPage)
+    plugin_manager.add_page('/plugins/custom/static/<path:path>', StaticMockPage.as_view("customproblemsstaticpage"))
     plugin_manager.add_hook("css", lambda: "/plugins/custom/static/custom.css")
     plugin_manager.add_hook("javascript_header", lambda: "/plugins/custom/static/custom.js")
     course_factory.get_task_factory().add_problem_type(DisplayableCustomProblem)
